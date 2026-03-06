@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import * as cache from "../cache";
 import { getEngineRegistry, getDefaultEngineConfig } from "../engines/registry";
+import pkg from "../../package.json";
 
 const router = new Hono();
 
@@ -16,13 +17,14 @@ function buildOpenSearchXml(origin: string): string {
 </OpenSearchDescription>`;
 }
 
-router.get("/", (c) => {
+router.get("/", async (c) => {
   const q = c.req.query("q");
   if (q?.trim()) {
     const params = new URLSearchParams(c.req.url.split("?")[1] || "");
     return c.redirect(`/search?${params.toString()}`, 302);
   }
-  return c.html(Bun.file("src/public/index.html").text());
+  const html = await Bun.file("src/public/index.html").text();
+  return c.html(html.replaceAll("__APP_VERSION__", pkg.version));
 });
 
 router.get("/search", (c) => c.html(Bun.file("src/public/search.html").text()));

@@ -10,6 +10,7 @@ import suggestRouter from "./routes/suggest";
 import extensionsRouter from "./routes/extensions";
 import settingsAuthRouter from "./routes/settings-auth";
 import proxyRouter from "./routes/proxy";
+import pkg from "../package.json";
 
 const app = new Hono();
 
@@ -30,5 +31,5 @@ const port = Number(process.env.DEGOOG_PORT) || 4444;
 
 Promise.all([initEngines(), initPlugins(), initSlotPlugins()]).then(() => {
   Bun.serve({ port, fetch: app.fetch });
-  console.log(`degoog running on http://localhost:${port}`);
+  console.log(`degoog v${pkg.version} running on http://localhost:${port}`);
 });
