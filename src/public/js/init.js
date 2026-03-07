@@ -6,6 +6,7 @@ import { initTabs } from "./tabs.js";
 import { initMediaPreview } from "./mediaPreview.js";
 import { initTheme } from "./theme.js";
 import { initTimeFilter } from "./timeFilter.js";
+import { initHomeFeed } from "./homeFeed.js";
 
 function copyToClipboardFallback(text, onSuccess) {
   const el = document.createElement("textarea");
@@ -76,5 +77,7 @@ export function init() {
   if (q) {
     searchInput.value = q;
     performSearch(q, type, page);
+  } else {
+    initHomeFeed();
   }
 }
