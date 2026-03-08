@@ -187,6 +187,20 @@ function renderField(field, currentValue, ext) {
       </div>`;
   }
 
+  if (field.type === "select" && Array.isArray(field.options) && field.options.length > 0) {
+    const opts = field.options
+      .map((v) => `<option value="${escapeHtml(v)}"${currentValue === v ? " selected" : ""}>${escapeHtml(v.charAt(0).toUpperCase() + v.slice(1))}</option>`)
+      .join("");
+    return `
+      <div class="ext-field" data-key="${escapeHtml(field.key)}" data-type="select">
+        <label class="ext-field-label" for="field-${escapeHtml(field.key)}">${escapeHtml(field.label)}</label>
+        <select id="field-${escapeHtml(field.key)}" class="ext-field-input ext-field-select">
+          ${opts}
+        </select>
+        ${descHtml}
+      </div>`;
+  }
+
   const inputType = field.type === "password" ? "password" : (field.type === "url" ? "url" : "text");
   return `
     <div class="ext-field" data-key="${escapeHtml(field.key)}" data-type="${escapeHtml(field.type)}" data-secret="${isSecret}" data-was-set="${isSet}">
@@ -214,6 +228,12 @@ function collectValues() {
     if (type === "toggle") {
       const input = fieldEl.querySelector("input[type=checkbox]");
       values[key] = input.checked ? "true" : "false";
+      return;
+    }
+
+    if (type === "select") {
+      const select = fieldEl.querySelector("select");
+      values[key] = select ? select.value : "";
       return;
     }
 

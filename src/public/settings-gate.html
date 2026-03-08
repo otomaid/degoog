@@ -1,6 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"__THEME_ATTRS__>
 <head>
+  <script>
+    (function () {
+      var r = document.documentElement;
+      var t = localStorage.getItem("theme");
+      if (t === "light") r.setAttribute("data-theme", "light");
+      else if (t === "dark") r.setAttribute("data-theme", "dark");
+      else { var m = window.matchMedia("(prefers-color-scheme: dark)"); r.setAttribute("data-theme", m.matches ? "dark" : "light"); }
+      try {
+        var req = indexedDB.open("degoog", 2);
+        req.onsuccess = function () {
+          try {
+            var db = req.result;
+            if (!db.objectStoreNames.contains("settings")) return;
+            var tx = db.transaction("settings", "readonly");
+            var store = tx.objectStore("settings");
+            var get = store.get("theme");
+            get.onsuccess = function () {
+              var v = get.result;
+              if (v === "light") r.setAttribute("data-theme", "light");
+              else if (v === "dark") r.setAttribute("data-theme", "dark");
+              else { var m2 = window.matchMedia("(prefers-color-scheme: dark)"); r.setAttribute("data-theme", m2.matches ? "dark" : "light"); }
+            };
+          } catch (e) {}
+        };
+      } catch (e) {}
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="degoog search settings.">

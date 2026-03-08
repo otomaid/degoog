@@ -10,11 +10,12 @@ export interface SearchResult {
 export interface SettingField {
   key: string;
   label: string;
-  type: "text" | "password" | "url" | "toggle" | "textarea";
+  type: "text" | "password" | "url" | "toggle" | "textarea" | "select";
   required?: boolean;
   placeholder?: string;
   description?: string;
   secret?: boolean;
+  options?: string[];
 }
 
 export interface ExtensionMeta {

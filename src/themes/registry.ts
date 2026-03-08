@@ -15,6 +15,7 @@ export interface ThemeManifest {
   css?: string;
   js?: string;
   settingsSchema?: SettingField[];
+  dataAttrsFromSettings?: Record<string, string>;
   html?: {
     index?: string;
     search?: string;
@@ -187,6 +188,27 @@ export async function getThemeExtensionMeta(): Promise<ExtensionMeta[]> {
   }
 
   return results;
+}
+
+export async function getActiveThemeDataAttrs(): Promise<string> {
+  const theme = getActiveTheme();
+  if (!theme?.manifest.dataAttrsFromSettings || Object.keys(theme.manifest.dataAttrsFromSettings).length === 0) {
+    return "";
+  }
+  const stored = await getSettings(settingsId(theme.id));
+  const parts: string[] = [];
+  for (const [settingKey, attrSuffix] of Object.entries(theme.manifest.dataAttrsFromSettings)) {
+    let value = stored[settingKey];
+    if (value == null || String(value).trim() === "") {
+      const field = theme.manifest.settingsSchema?.find((f) => f.key === settingKey);
+      if (field?.type === "select" && field.options?.length) value = field.options[0];
+      if (value == null || String(value).trim() === "") continue;
+    }
+    const attrName = attrSuffix.startsWith("data-") ? attrSuffix : `data-${attrSuffix}`;
+    const escaped = String(value).replace(/"/g, "&quot;").trim();
+    parts.push(`${attrName}="${escaped}"`);
+  }
+  return parts.length > 0 ? " " + parts.join(" ") : "";
 }
 
 export async function recompileTheme(id: string): Promise<void> {

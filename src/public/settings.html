@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"__THEME_ATTRS__>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,9 @@
   <link rel="icon" href="/public/favicon/favicon.ico?v=__APP_VERSION__" type="image/x-icon">
   <link rel="manifest" href="/public/favicon/site.webmanifest?v=__APP_VERSION__">
   <title>Settings – degoog</title>
+  <script>
+    (function(){var t=localStorage.getItem("theme");var r=document.documentElement;if(t==="light")r.setAttribute("data-theme","light");else if(t==="dark")r.setAttribute("data-theme","dark");else{var m=window.matchMedia("(prefers-color-scheme: dark)");r.setAttribute("data-theme",m.matches?"dark":"light");}})();
+  </script>
   <link rel="stylesheet" href="/public/style.css?v=__APP_VERSION__">
   __THEME_CSS__
 </head>

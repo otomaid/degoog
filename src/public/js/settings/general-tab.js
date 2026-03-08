@@ -35,8 +35,12 @@ export async function initGeneralTab(getToken) {
 
   document.getElementById("settings-save").addEventListener("click", async () => {
     if (themeSelect) {
-      await idbSet(THEME_KEY, themeSelect.value);
-      applyTheme(themeSelect.value);
+      const value = themeSelect.value;
+      await idbSet(THEME_KEY, value);
+      try {
+        localStorage.setItem(THEME_KEY, value);
+      } catch (_) {}
+      applyTheme(value);
     }
     if (proxyEnabled && proxyUrls) {
       try {

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import * as cache from "../cache";
 import { getEngineRegistry, getDefaultEngineConfig } from "../engines/registry";
-import { getThemeHtml, getActiveTheme } from "../themes/registry";
+import { getThemeHtml, getActiveTheme, getActiveThemeDataAttrs } from "../themes/registry";
 import { getAllPluginCss, getPluginScriptFolders } from "../plugin-assets";
 import { shouldServeSettingsGate } from "./settings-auth";
 import pkg from "../../package.json";
@@ -47,9 +47,11 @@ router.get("/", async (c) => {
     return c.html(override.replaceAll("__APP_VERSION__", pkg.version));
   }
   const html = await Bun.file("src/public/index.html").text();
+  const themeAttrs = await getActiveThemeDataAttrs();
   const out = html
     .replaceAll("__APP_VERSION__", pkg.version)
-    .replace("__THEME_CSS__", themeCssPlaceholder());
+    .replace("__THEME_CSS__", themeCssPlaceholder())
+    .replace("__THEME_ATTRS__", themeAttrs);
   return c.html(out);
 });
 
@@ -57,24 +59,30 @@ router.get("/search", async (c) => {
   const override = await getThemeHtml("search");
   if (override) return c.html(override.replaceAll("__APP_VERSION__", pkg.version));
   const html = await Bun.file("src/public/search.html").text();
+  const themeAttrs = await getActiveThemeDataAttrs();
   const out = html
     .replaceAll("__APP_VERSION__", pkg.version)
     .replace("__THEME_CSS__", themeCssPlaceholder())
+    .replace("__THEME_ATTRS__", themeAttrs)
     .replace("__PLUGIN_ASSETS__", pluginAssetsPlaceholder());
   return c.html(out);
 });
 router.get("/settings", async (c) => {
   if (await shouldServeSettingsGate(c)) {
     const html = await Bun.file("src/public/settings-gate.html").text();
+    const themeAttrs = await getActiveThemeDataAttrs();
     const out = html
       .replaceAll("__APP_VERSION__", pkg.version)
-      .replace("__THEME_CSS__", themeCssPlaceholder());
+      .replace("__THEME_CSS__", themeCssPlaceholder())
+      .replace("__THEME_ATTRS__", themeAttrs);
     return c.html(out);
   }
   const html = await Bun.file("src/public/settings.html").text();
+  const themeAttrs = await getActiveThemeDataAttrs();
   const out = html
     .replaceAll("__APP_VERSION__", pkg.version)
-    .replace("__THEME_CSS__", themeCssPlaceholder());
+    .replace("__THEME_CSS__", themeCssPlaceholder())
+    .replace("__THEME_ATTRS__", themeAttrs);
   return c.html(out);
 });
 
