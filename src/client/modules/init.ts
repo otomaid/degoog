@@ -6,7 +6,7 @@ import { initTabs } from "./tabs";
 import { initMediaPreview } from "./mediaPreview";
 import { initTheme } from "./theme";
 import { initTimeFilter } from "./timeFilter";
-import { initHomeFeed } from "./homeFeed";
+
 import { initInstallPrompt } from "./installPrompt";
 import { initSearchBarActions } from "./searchBarActions";
 
@@ -93,7 +93,5 @@ export function init(): void {
   if (q) {
     if (searchInput) searchInput.value = q;
     void performSearch(q, type, page);
-  } else {
-    void initHomeFeed();
   }
 }

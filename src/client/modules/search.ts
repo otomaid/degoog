@@ -36,7 +36,7 @@ const _fetchCommands = async (): Promise<Command[]> => {
 
 export async function performSearch(query: string, type?: string, page?: number): Promise<void> {
   const resolvedType = type || state.currentType || "all";
-  if (!query.trim() && resolvedType !== "news") return;
+  if (!query.trim()) return;
 
   if (query.trim().startsWith("!")) {
     state.currentQuery = query;
@@ -100,9 +100,7 @@ export async function performSearch(query: string, type?: string, page?: number)
     state.currentData = data;
 
     const metaText = `About ${data.results.length} results (${(data.totalTime / 1000).toFixed(2)} seconds)`;
-    setResultsMeta(metaText, resolvedType === "news" && query.trim().length > 0, () =>
-      void performSearch("", "news"),
-    );
+    setResultsMeta(metaText);
 
     if (resolvedType === "all") {
       renderSidebar(data, (q) => void performSearch(q));
@@ -141,9 +139,7 @@ async function _performSearchWithBang(
     state.currentResults = searchData.results;
     state.currentData = searchData;
     const metaText = `About ${searchData.results.length} results (${(searchData.totalTime / 1000).toFixed(2)} seconds)`;
-    setResultsMeta(metaText, type === "news" && query.trim().length > 0, () =>
-      void performSearch("", "news"),
-    );
+    setResultsMeta(metaText);
     if (type === "all") {
       renderSidebar(searchData, (q) => void performSearch(q));
       renderSlotPanels(searchData.slotPanels || []);
@@ -283,11 +279,7 @@ export async function goToPage(pageNum: number): Promise<void> {
     state.currentData = data;
     state.currentPage = pageNum;
     const metaText = `About ${state.currentResults.length} results — Page ${state.currentPage}`;
-    setResultsMeta(
-      metaText,
-      state.currentType === "news" && state.currentQuery.trim().length > 0,
-      () => void performSearch("", "news"),
-    );
+    setResultsMeta(metaText);
     if (state.currentPage === 1 && data.atAGlance) {
       renderAtAGlance(data.atAGlance);
     }

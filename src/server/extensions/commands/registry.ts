@@ -315,7 +315,7 @@ export async function getPluginExtensionMeta(): Promise<ExtensionMeta[]> {
     const maskedSettings = maskSecrets(rawSettings, schema);
     if (rawSettings["disabled"])
       maskedSettings["disabled"] = rawSettings["disabled"];
-    results.push({
+    const meta: ExtensionMeta = {
       id: entry.id,
       displayName: entry.displayName,
       description: entry.instance.description,
@@ -323,7 +323,12 @@ export async function getPluginExtensionMeta(): Promise<ExtensionMeta[]> {
       configurable: schema.length > 0,
       settingsSchema: schema,
       settings: maskedSettings,
-    });
+    };
+    const inst = entry.instance as Record<string, unknown>;
+    if (Array.isArray(inst.defaultFeedUrls)) {
+      meta.defaultFeedUrls = inst.defaultFeedUrls as string[];
+    }
+    results.push(meta);
   }
 
   return results;

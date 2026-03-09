@@ -9,26 +9,10 @@ export function runScriptsInContainer(container: HTMLElement | null): void {
   });
 }
 
-export function setResultsMeta(
-  metaText: string,
-  showClearQuery = false,
-  onClearQuery: () => void,
-): void {
+export function setResultsMeta(metaText: string): void {
   const el = document.getElementById("results-meta");
   if (!el) return;
-  if (showClearQuery) {
-    el.innerHTML = "";
-    const span = document.createElement("span");
-    span.textContent = metaText;
-    el.appendChild(span);
-    const btn = document.createElement("a");
-    btn.className = "news-clear-query-btn";
-    btn.textContent = "Clear query and show latest news";
-    btn.addEventListener("click", onClearQuery);
-    el.appendChild(btn);
-  } else {
-    el.textContent = metaText;
-  }
+  el.textContent = metaText;
 }
 
 export const getNaturalLanguageBangQuery = (

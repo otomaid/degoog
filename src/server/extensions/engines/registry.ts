@@ -16,9 +16,7 @@ import { GoogleImagesEngine } from "./google-images";
 import { BingImagesEngine } from "./bing-images";
 import { GoogleVideosEngine } from "./google-videos";
 import { BingVideosEngine } from "./bing-videos";
-import { RssNewsEngine } from "./rss";
 import { BraveNewsEngine } from "./brave-news";
-import { DEFAULT_NEWS_FEED_URLS } from "../../news-rss";
 import { BingNewsEngine } from "./bing-news";
 export type EngineSearchType = "web" | "images" | "videos" | "news";
 
@@ -102,13 +100,6 @@ const BUILTIN_DEFINITIONS: EngineDefinition[] = [
     searchType: "videos",
     EngineClass: BingVideosEngine,
     outgoingHosts: ["www.bing.com", "bing.com"],
-  },
-  {
-    id: "rss-news",
-    displayName: "RSS Feeds",
-    searchType: "news",
-    EngineClass: RssNewsEngine,
-    outgoingHosts: ["*"],
   },
   {
     id: "brave-news",
@@ -312,9 +303,6 @@ export async function getEngineExtensionMeta(): Promise<ExtensionMeta[]> {
       settingsSchema: schema,
       settings: maskedSettings,
       defaultEnabled: defaults[def.id],
-      ...(def.id === "rss-news"
-        ? { defaultFeedUrls: DEFAULT_NEWS_FEED_URLS }
-        : {}),
     });
   }
 

@@ -134,7 +134,7 @@ export const renderField = (field: SettingField, currentValue: string, ext: Exte
     ? `<p class="ext-field-desc">${escapeHtml(field.description)}</p>`
     : "";
 
-  if (ext?.id === "rss-news" && field.key === "urls") {
+  if (field.type === "urllist") {
     return _renderRssUrlListField(field, ext);
   }
 

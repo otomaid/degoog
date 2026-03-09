@@ -71,7 +71,7 @@ router.get("/api/search", async (c) => {
   const searchType = (c.req.query("type") || "all") as SearchType;
   let query = c.req.query("q") ?? "";
   if (typeof query !== "string") query = "";
-  if (!query.trim() && searchType !== "news")
+  if (!query.trim())
     return c.json({ error: "Missing query parameter 'q'" }, 400);
 
   const engines = parseEngineConfig(new URL(c.req.url).searchParams);
