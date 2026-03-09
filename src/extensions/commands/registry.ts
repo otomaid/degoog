@@ -22,7 +22,7 @@ interface CommandEntry {
   instance: BangCommand;
 }
 
-const builtinsDir = join(process.cwd(), "src", "commands", "builtins");
+const builtinsDir = join(process.cwd(), "src", "extensions", "commands", "builtins");
 let allCommands: CommandEntry[] = [];
 let userAliases: Record<string, string> = {};
 

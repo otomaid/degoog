@@ -5,7 +5,13 @@ import { addPluginCss, registerPluginScript } from "../../plugin-assets";
 import { debug } from "../../logger";
 
 let slotPlugins: SlotPlugin[] = [];
-const builtinsDir = join(process.cwd(), "src", "commands", "builtins");
+const builtinsDir = join(
+  process.cwd(),
+  "src",
+  "extensions",
+  "commands",
+  "builtins",
+);
 
 function isSlotPlugin(val: unknown): val is SlotPlugin {
   return (

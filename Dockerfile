@@ -9,7 +9,7 @@ FROM base AS build
 COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
 COPY . .
-RUN bun run build:css
+RUN bun run build
 
 FROM base AS release
 RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*

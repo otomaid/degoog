@@ -31,7 +31,7 @@ function isValidType(type: string): type is ItemType {
   return (VALID_TYPES as readonly string[]).includes(type);
 }
 
-router.use("*", async (c: Context, next: Next) => {
+router.use("/api/store/*", async (c: Context, next: Next) => {
   if (!(await validateSettingsToken(getStoreToken(c)))) {
     return c.json({ error: "Unauthorized" }, 401);
   }
