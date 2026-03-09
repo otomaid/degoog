@@ -1,15 +1,18 @@
 import { describe, test, expect, beforeAll } from "bun:test";
 
-let searchBarRouter: { request: (req: Request | string) => Response | Promise<Response> };
+let searchBarRouter: {
+  request: (req: Request | string) => Response | Promise<Response>;
+};
 
 beforeAll(async () => {
-  const { initSearchBarActions } = await import("../../src/search-bar/registry");
+  const { initSearchBarActions } =
+    await import("../../src/server/extensions/search-bar/registry");
   const orig = process.env.DEGOOG_PLUGINS_DIR;
   process.env.DEGOOG_PLUGINS_DIR = "/nonexistent-plugins-dir";
   await initSearchBarActions();
   if (orig !== undefined) process.env.DEGOOG_PLUGINS_DIR = orig;
   else delete process.env.DEGOOG_PLUGINS_DIR;
-  const mod = await import("../../src/routes/search-bar");
+  const mod = await import("../../src/server/routes/search-bar");
   searchBarRouter = mod.default;
 });
 

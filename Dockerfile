@@ -9,7 +9,7 @@ FROM base AS build
 COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
 COPY . .
-RUN bun run build:css
+RUN bun run build
 
 FROM base AS release
 RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
@@ -22,4 +22,4 @@ ENV PORT=4444
 EXPOSE 4444
 
 USER bun
-ENTRYPOINT ["bun", "run", "src/server.ts"]
+ENTRYPOINT ["bun", "run", "src/server/index.ts"]

@@ -1,6 +1,6 @@
 import { describe, test, expect } from "bun:test";
-import { DuckDuckGoEngine } from "../../src/engines/duckduckgo";
-import type { SearchResult } from "../../src/types";
+import { DuckDuckGoEngine } from "../../src/server/extensions/engines/duckduckgo";
+import type { SearchResult } from "../../src/server/types";
 
 const fixtureHtml = `
 <html>
@@ -43,7 +43,9 @@ describe("engine execution", () => {
     let capturedUrl = "";
     const mockFetch = async (url: string): Promise<Response> => {
       capturedUrl = url;
-      return new Response("<html><body><div class=\"result\"></div></body></html>");
+      return new Response(
+        '<html><body><div class="result"></div></body></html>',
+      );
     };
     await engine.executeSearch("q", 1, "day", { fetch: mockFetch });
     expect(capturedUrl).toContain("df=d");
