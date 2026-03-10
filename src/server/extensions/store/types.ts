@@ -6,6 +6,7 @@ export interface RepoInfo {
   name: string;
   description: string;
   error: string | null;
+  repoImage?: string | null;
 }
 
 export interface StoreItem {
@@ -25,6 +26,8 @@ export interface StoreItem {
   screenshots: string[];
   installed: boolean;
   installedVersion?: string;
+  pluginType?: string;
+  engineType?: string;
 }
 
 export interface InstalledItem {
@@ -47,7 +50,8 @@ export interface RepoPackageJson {
   author?: string;
   plugins?: Array<{ path: string; name: string; description?: string; version?: string; type?: string; dependencies?: string[] }>;
   themes?: Array<{ path: string; name: string; description?: string; version?: string; dependencies?: string[] }>;
-  engines?: Array<{ path: string; name: string; description?: string; version?: string; dependencies?: string[] }>;
+  engines?: Array<{ path: string; name: string; description?: string; version?: string; type?: string; dependencies?: string[] }>;
+  "repo-image"?: string;
 }
 
 export interface AuthorJson {

@@ -16,6 +16,7 @@ import {
   getInstalledItems,
   getStoreDirPath,
   resolveScreenshotPath,
+  resolveRepoAssetPath,
 } from "../extensions/store/repo-manager";
 
 const router = new Hono();
@@ -41,6 +42,29 @@ router.use("/api/store/*", async (c: Context, next: Next) => {
 router.get("/api/store/repos", async (c) => {
   const repos = await getRepos();
   return c.json({ repos });
+});
+
+router.get("/api/store/repos/:repoSlug/asset", async (c) => {
+  const repoSlug = c.req.param("repoSlug");
+  const pathParam = c.req.query("path");
+  if (!pathParam?.trim()) return c.json({ error: "Missing path" }, 400);
+  const resolved = resolveRepoAssetPath(repoSlug, pathParam.trim());
+  if (!resolved || !existsSync(resolved)) {
+    return c.json({ error: "Not found" }, 404);
+  }
+  const file = Bun.file(resolved);
+  const ext = resolved.toLowerCase().slice(resolved.lastIndexOf("."));
+  const contentType =
+    ext === ".svg"
+      ? "image/svg+xml"
+      : ext === ".png"
+        ? "image/png"
+        : ext === ".webp"
+          ? "image/webp"
+          : "image/jpeg";
+  return c.body(await file.arrayBuffer(), 200, {
+    "Content-Type": contentType,
+  });
 });
 
 router.get("/api/store/repos/status", async (c) => {
