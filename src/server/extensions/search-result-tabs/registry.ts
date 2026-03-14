@@ -1,6 +1,9 @@
 import { join } from "path";
 import type { SearchResultTab, PluginContext } from "../../types";
-import { getSettings } from "../../utils/plugin-settings";
+import {
+  getSettings,
+  mergeDefaults,
+} from "../../utils/plugin-settings";
 import {
   addPluginCss,
   registerPluginScript,
@@ -83,7 +86,9 @@ async function loadTabsFromRoot(
       if (tab.settingsSchema?.length && tab.configure) {
         try {
           const stored = await getSettings(tabSettingsId);
-          if (Object.keys(stored).length > 0) tab.configure(stored);
+          tab.configure(
+            mergeDefaults(stored, tab.settingsSchema),
+          );
         } catch (err) {
           debug(
             "search-result-tabs",

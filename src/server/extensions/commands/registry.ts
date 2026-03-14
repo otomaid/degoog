@@ -10,6 +10,7 @@ import {
   getSettings,
   maskSecrets,
   asString,
+  mergeDefaults,
 } from "../../utils/plugin-settings";
 import { addPluginCss, registerPluginScript } from "../../utils/plugin-assets";
 import { debug } from "../../utils/logger";
@@ -120,7 +121,9 @@ async function loadCommandsFromRoot(
 
       if (instance.configure && instance.settingsSchema?.length) {
         const stored = await getSettings(id);
-        if (Object.keys(stored).length > 0) instance.configure(stored);
+        instance.configure(
+          mergeDefaults(stored, instance.settingsSchema),
+        );
       }
       allCommands.push({
         id,

@@ -1,6 +1,9 @@
 import { join } from "path";
 import type { SlotPlugin, SlotPanelPosition, PluginContext } from "../../types";
-import { getSettings } from "../../utils/plugin-settings";
+import {
+  getSettings,
+  mergeDefaults,
+} from "../../utils/plugin-settings";
 import {
   addPluginCss,
   registerPluginScript,
@@ -100,7 +103,9 @@ async function loadSlotsFromRoot(
       if (slot.settingsSchema?.length && slot.configure) {
         try {
           const stored = await getSettings(slotSettingsId);
-          if (Object.keys(stored).length > 0) slot.configure(stored);
+          slot.configure(
+            mergeDefaults(stored, slot.settingsSchema),
+          );
         } catch (err) {
           debug("slots", `Failed to configure slot plugin: ${slot.id}`, err);
         }
