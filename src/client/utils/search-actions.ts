@@ -46,7 +46,7 @@ const _fetchCommands = async (): Promise<Command[]> => {
       commandsCache = body.commands || [];
       return commandsCache;
     }
-  } catch {}
+  } catch { }
   return [];
 };
 
@@ -148,16 +148,21 @@ export async function performSearch(
     const metaText = `About ${data.results.length} results (${(data.totalTime / 1000).toFixed(2)} seconds)`;
     setResultsMeta(metaText);
 
-    if (resolvedType === "all") {
-      renderSidebar(data, (q) => void performSearch(q));
-      renderSlotPanels(data.slotPanels || []);
-      void fetchGlancePanels(query, data.results, data.atAGlance);
-      if (!data.slotPanels || data.slotPanels.length === 0)
-        void fetchSlotPanels(query);
-    }
-    if (resolvedType !== "all") {
+    const isMediaType = resolvedType === "images" || resolvedType === "videos";
+    if (isMediaType) {
       if (glanceEl) glanceEl.innerHTML = "";
       if (sidebar) sidebar.innerHTML = "";
+    } else {
+      renderSidebar(data, (q) => void performSearch(q));
+      if (resolvedType === "all") {
+        renderSlotPanels(data.slotPanels || []);
+        void fetchGlancePanels(query, data.results, data.atAGlance);
+        if (!data.slotPanels || data.slotPanels.length === 0)
+          void fetchSlotPanels(query);
+      } else {
+        if (glanceEl) glanceEl.innerHTML = "";
+        renderSlotPanels(data.slotPanels || []);
+      }
     }
     renderResults(data.results);
   } catch {
@@ -188,14 +193,19 @@ async function _performSearchWithBang(
     state.currentData = searchData;
     const metaText = `About ${searchData.results.length} results (${(searchData.totalTime / 1000).toFixed(2)} seconds)`;
     setResultsMeta(metaText);
-    if (type === "all") {
-      renderSidebar(searchData, (q) => void performSearch(q));
-      renderSlotPanels(searchData.slotPanels || []);
-      void fetchSlotPanels(query);
-    }
-    if (type !== "all") {
+    const isMediaType = type === "images" || type === "videos";
+    if (isMediaType) {
       if (glanceEl) glanceEl.innerHTML = "";
       if (sidebar) sidebar.innerHTML = "";
+    } else {
+      renderSidebar(searchData, (q) => void performSearch(q));
+      if (type === "all") {
+        renderSlotPanels(searchData.slotPanels || []);
+        void fetchSlotPanels(query);
+      } else {
+        if (glanceEl) glanceEl.innerHTML = "";
+        renderSlotPanels(searchData.slotPanels || []);
+      }
     }
     renderResults(searchData.results);
 
@@ -419,10 +429,12 @@ export async function retryEngine(engineName: string): Promise<void> {
       renderResults(data.results);
     }
 
-    if (state.currentType === "all" && state.currentData) {
+    const isMediaType =
+      state.currentType === "images" || state.currentType === "videos";
+    if (!isMediaType && state.currentData) {
       renderSidebar(state.currentData, (q) => void performSearch(q));
     }
-  } catch {}
+  } catch { }
 }
 
 export async function performLucky(query: string): Promise<void> {

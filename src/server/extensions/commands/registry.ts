@@ -1,9 +1,5 @@
 import { join } from "path";
-import type {
-  BangCommand,
-  ExtensionMeta,
-  SettingField,
-} from "../../types";
+import type { BangCommand, ExtensionMeta, SettingField } from "../../types";
 import { getEngineMap as getSearchEngineMap } from "../engines/registry";
 import {
   getSettings,
@@ -264,8 +260,14 @@ const NATURAL_LANGUAGE_FIELD: SettingField = {
     "When on, typing the trigger or phrase without ! runs the command and shows search results below.",
 };
 
-function schemaWithNaturalLanguage(schema: SettingField[]): SettingField[] {
+function schemaWithNaturalLanguage(
+  schema: SettingField[],
+  naturalLanguagePhrases: string[] | undefined,
+): SettingField[] {
   if (schema.some((f) => f.key === "naturalLanguage")) return schema;
+  const hasPhrases =
+    Array.isArray(naturalLanguagePhrases) && naturalLanguagePhrases.length > 0;
+  if (!hasPhrases) return schema;
   return [...schema, NATURAL_LANGUAGE_FIELD];
 }
 
@@ -275,7 +277,10 @@ export async function getPluginExtensionMeta(): Promise<ExtensionMeta[]> {
 
   for (const entry of allCommands) {
     const baseSchema = entry.instance.settingsSchema ?? [];
-    const schema = schemaWithNaturalLanguage(baseSchema);
+    const schema = schemaWithNaturalLanguage(
+      baseSchema,
+      entry.instance.naturalLanguagePhrases,
+    );
     let rawSettings = await getSettings(entry.id);
     if (
       entry.id.startsWith("plugin-") &&

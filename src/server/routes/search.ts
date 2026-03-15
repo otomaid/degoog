@@ -89,7 +89,7 @@ async function runSlotPlugins(
         html: out.html,
         position: plugin.position,
       });
-    } catch {}
+    } catch { }
   }
   return panels;
 }
@@ -185,7 +185,7 @@ router.post("/api/slots/glance", async (c) => {
         html: out.html,
         position: plugin.position,
       });
-    } catch {}
+    } catch { }
   }
   return c.json({ panels });
 });
@@ -344,6 +344,9 @@ router.get("/api/tab-search", async (c) => {
     return c.json({ error: "Tab not found" }, 404);
   }
 
+  const startTime = performance.now();
+  const engineTimings: EngineTiming[] = [];
+
   try {
     const allResults: ScoredResult[] = [];
     let totalPages = 1;
@@ -351,30 +354,60 @@ router.get("/api/tab-search", async (c) => {
     if (engineType) {
       const engines = getEnginesForCustomType(engineType);
       const engineContext = { fetch: outgoingFetch };
-      const settled = await Promise.allSettled(
-        engines.map((e) =>
-          e.executeSearch(query.trim(), page, undefined, engineContext),
-        ),
-      );
-      let idx = 0;
-      for (const s of settled) {
-        if (s.status === "fulfilled") {
-          for (const r of s.value) {
-            allResults.push({
-              ...r,
-              score: Math.max(100 - idx, 1),
-              sources: [r.source],
-            });
-            idx++;
+      const outcomes = await Promise.all(
+        engines.map(async (e) => {
+          const start = performance.now();
+          try {
+            const value = await e.executeSearch(
+              query.trim(),
+              page,
+              undefined,
+              engineContext,
+            );
+            return {
+              name: e.name,
+              time: Math.round(performance.now() - start),
+              resultCount: value.length,
+              results: value,
+            };
+          } catch {
+            return {
+              name: e.name,
+              time: Math.round(performance.now() - start),
+              resultCount: 0,
+              results: [] as ScoredResult[],
+            };
           }
+        }),
+      );
+      for (const o of outcomes) {
+        engineTimings.push({
+          name: o.name,
+          time: o.time,
+          resultCount: o.resultCount,
+        });
+        let idx = allResults.length;
+        for (const r of o.results) {
+          allResults.push({
+            ...r,
+            score: Math.max(100 - idx, 1),
+            sources: [r.source],
+          });
+          idx++;
         }
       }
       if (allResults.length > 0) totalPages = 10;
     }
 
     if (tab?.executeSearch && !(await isDisabled(tab.settingsId ?? `tab-${tab.id}`))) {
+      const tabStart = performance.now();
       const result = await tab.executeSearch(query.trim(), page, {
         clientIp: clientIp ?? undefined,
+      });
+      engineTimings.push({
+        name: tab.name,
+        time: Math.round(performance.now() - tabStart),
+        resultCount: result.results.length,
       });
       const offset = allResults.length;
       for (let i = 0; i < result.results.length; i++) {
@@ -389,7 +422,14 @@ router.get("/api/tab-search", async (c) => {
         totalPages = result.totalPages;
     }
 
-    return c.json({ results: allResults, totalPages, page });
+    const totalTime = Math.round(performance.now() - startTime);
+    return c.json({
+      results: allResults,
+      totalPages,
+      page,
+      engineTimings,
+      totalTime,
+    });
   } catch (err) {
     return c.json(
       { error: err instanceof Error ? err.message : "Tab search failed" },
